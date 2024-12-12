@@ -1,20 +1,20 @@
 export type WallGrid = boolean[][][];
 
 class Maze {
-  private height: number;
   private width: number;
+  private height: number;
   private walls: WallGrid;
 
   constructor(width: number, height: number, walls?: WallGrid | null) {
-    this.height = width;
     this.width = height;
+    this.height = width;
     if (walls !== undefined && walls !== null) {
       this.walls = walls;
     } else {
       this.walls = [[], []];
       for (let i = 0; i < 2; i++) {
-        const rows = width + i;
-        const cols = height + 1 - i;
+        const rows = height + i;
+        const cols = width + 1 - i;
         this.walls[i] = Array.from({ length: rows }, () =>
           Array.from({ length: cols }, () => true)
         );
@@ -35,7 +35,7 @@ class Maze {
   }
 
   private backTracking(r: () => number): void {
-    const n = this.height * this.width;
+    const n = this.width * this.height;
     let current = this.getRandomInt(0, n);
     const visited = new Array<boolean>(n).fill(false);
     visited[current] = true;
@@ -86,11 +86,11 @@ class Maze {
   }
 
   public getWidth(): number {
-    return this.height;
+    return this.width;
   }
 
   public getHeight(): number {
-    return this.width;
+    return this.height;
   }
 
   public getWalls(): WallGrid {
@@ -106,12 +106,12 @@ class Maze {
   }
 
   private toIndex(x: number, y: number): number {
-    return x + this.height * y;
+    return x + this.width * y;
   }
 
   private fromIndex(index: number): [number, number] {
-    const x = index % this.height;
-    const y = Math.floor(index / this.height);
+    const x = index % this.width;
+    const y = Math.floor(index / this.width);
     return [x, y];
   }
 
@@ -121,8 +121,8 @@ class Maze {
 
     if (y > 0) result.push(this.toIndex(x, y - 1));
     if (x > 0) result.push(this.toIndex(x - 1, y));
-    if (x + 1 < this.height) result.push(this.toIndex(x + 1, y));
-    if (y + 1 < this.width) result.push(this.toIndex(x, y + 1));
+    if (x + 1 < this.width) result.push(this.toIndex(x + 1, y));
+    if (y + 1 < this.height) result.push(this.toIndex(x, y + 1));
 
     return result;
   }

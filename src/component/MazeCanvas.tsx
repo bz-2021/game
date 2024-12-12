@@ -14,9 +14,6 @@ const MazeCanvas: React.FC<MazeCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const grid = maze.getWalls();
 
-  console.log(grid);
-  
-  
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
