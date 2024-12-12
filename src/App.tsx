@@ -1,8 +1,10 @@
+import MazeCanvas from "./component/MazeCanvas"
+import Maze from "./utils/maze"
+
 const App = () => {
+  const maze = new Maze(5, 7)
   return (
-    <div>
-      <p>Hello world</p>
-    </div>
+    <MazeCanvas maze={maze} />
   )
 }
 

@@ -1,32 +1,42 @@
-import { randomInt } from "crypto";
-
-type WallGrid = boolean[][][];
+export type WallGrid = boolean[][][];
 
 class Maze {
-  private width: number;
   private height: number;
+  private width: number;
   private walls: WallGrid;
 
-  constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-    this.walls = [[], []];
-
-    for (let i = 0; i < 2; i++) {
-      const rows = width + i;
-      const cols = height + 1 - i;
-      this.walls[i] = Array.from({ length: rows }, () =>
-        Array.from({ length: cols }, () => true)
-      );
+  constructor(width: number, height: number, walls?: WallGrid | null) {
+    this.height = width;
+    this.width = height;
+    if (walls !== undefined && walls !== null) {
+      this.walls = walls;
+    } else {
+      this.walls = [[], []];
+      for (let i = 0; i < 2; i++) {
+        const rows = width + i;
+        const cols = height + 1 - i;
+        this.walls[i] = Array.from({ length: rows }, () =>
+          Array.from({ length: cols }, () => true)
+        );
+      }
+      this.refresh();
     }
+  }
 
-    const rand = () => randomInt(0, 100)
-    this.backTracking(rand)
+  private getRandomInt(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+
+  public refresh(): void {
+    const rand = () => this.getRandomInt(0, 100);
+    this.backTracking(rand);
   }
 
   private backTracking(r: () => number): void {
-    const n = this.width * this.height;
-    let current = randomInt(0, n);
+    const n = this.height * this.width;
+    let current = this.getRandomInt(0, n);
     const visited = new Array<boolean>(n).fill(false);
     visited[current] = true;
     const stack: number[] = [];
@@ -76,47 +86,43 @@ class Maze {
   }
 
   public getWidth(): number {
-    return this.width;
-  }
-
-  public getHeight(): number {
     return this.height;
   }
 
-  public wallAbove(x: number, y: number): boolean {
-    return this.walls[0][x][y];
+  public getHeight(): number {
+    return this.width;
   }
 
-  public setWallAbove(x: number, y: number, value: boolean): void {
+  public getWalls(): WallGrid {
+    return this.walls;
+  }
+
+  private setWallAbove(x: number, y: number, value: boolean): void {
     this.walls[0][x][y] = value;
   }
 
-  public wallLeftOf(x: number, y: number): boolean {
-    return this.walls[1][x][y];
-  }
-
-  public setWallLeftOf(x: number, y: number, value: boolean): void {
+  private setWallLeftOf(x: number, y: number, value: boolean): void {
     this.walls[1][x][y] = value;
   }
 
-  public toIndex(x: number, y: number): number {
-    return x + y * this.width;
+  private toIndex(x: number, y: number): number {
+    return x + this.height * y;
   }
 
-  public fromIndex(index: number): [number, number] {
-    const x = index % this.width;
-    const y = Math.floor(index / this.width);
+  private fromIndex(index: number): [number, number] {
+    const x = index % this.height;
+    const y = Math.floor(index / this.height);
     return [x, y];
   }
 
-  public neighbors(index: number): number[] {
+  private neighbors(index: number): number[] {
     const [x, y] = this.fromIndex(index);
     const result: number[] = [];
 
     if (y > 0) result.push(this.toIndex(x, y - 1));
     if (x > 0) result.push(this.toIndex(x - 1, y));
-    if (x + 1 < this.width) result.push(this.toIndex(x + 1, y));
-    if (y + 1 < this.height) result.push(this.toIndex(x, y + 1));
+    if (x + 1 < this.height) result.push(this.toIndex(x + 1, y));
+    if (y + 1 < this.width) result.push(this.toIndex(x, y + 1));
 
     return result;
   }
